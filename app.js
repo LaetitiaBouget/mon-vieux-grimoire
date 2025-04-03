@@ -8,6 +8,7 @@ mongoose.connect(mongoUri)
 .catch(err => console.error('Connexion à MongoDB échouée !', err));
 
 const booksRoutes = require('./routes/books');
+const userRoutes = require('./routes/user');
 
 const app = express();
 
@@ -21,6 +22,7 @@ app.use((req, res, next) => {
 app.use(express.json());
 
 app.use('/api/books', booksRoutes);
+app.use('/api/auth', userRoutes);
 
 module.exports = app;
 
