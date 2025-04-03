@@ -1,11 +1,13 @@
 const express = require('express');
 const mongoose = require('mongoose');
+require('dotenv').config();
+const mongoUri = process.env.MONGO_URI;
 
-const uri = 'mongodb+srv://letitibou:MGzOhZPFXhJ72gA0@cluster0.7649tae.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
-
-mongoose.connect(uri)
+mongoose.connect(mongoUri)
 .then(() => console.log('Connexion à MongoDB réussie !'))
 .catch(err => console.error('Connexion à MongoDB échouée !', err));
+
+const booksRoutes = require('./routes/books');
 
 const app = express();
 
@@ -18,6 +20,7 @@ app.use((req, res, next) => {
 
 app.use(express.json());
 
+app.use('/api/books', booksRoutes);
 
 module.exports = app;
 
