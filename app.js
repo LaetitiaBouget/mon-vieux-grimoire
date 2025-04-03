@@ -1,4 +1,11 @@
 const express = require('express');
+const mongoose = require('mongoose');
+
+const uri = 'mongodb+srv://letitibou:MGzOhZPFXhJ72gA0@cluster0.7649tae.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
+
+mongoose.connect(uri)
+.then(() => console.log('Connexion à MongoDB réussie !'))
+.catch(err => console.error('Connexion à MongoDB échouée !', err));
 
 const app = express();
 
