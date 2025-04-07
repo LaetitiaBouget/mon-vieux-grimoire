@@ -68,3 +68,36 @@ exports.deleteBook = (req, res, next) => {
         .catch(error => { res.status(500).json({ error })});
 
 };
+
+exports.ratingBook = (req, res, next) => {
+
+    const ratingObject = { 
+        userId: req.body.userId,
+        grade: req.body.rating
+    }
+
+    Book.findOne({_id:req.params.id})
+        .then(book => {
+            if(!book) {
+                return res.status(401).json({  message:'Livre non trouvé'})
+            }
+
+            if (book.ratings.some( rating => rating.userId === req.auth.userId)) {
+                return res.status(400).json({  message:'Vous avez déjà noté ce livre'})
+            } 
+
+            book.ratings.push(ratingObject)
+
+            let sumRatings = 0;
+            let nbOfRatings = book.ratings.length;
+            book.ratings.forEach(rating => {
+                sumRatings += rating.grade;
+            })
+            
+            book.averageRating = Math.round(sumRatings / nbOfRatings);
+            
+            book.save()
+                .then(() => {res.status(201).json(book)})
+                .catch(error => res.status(400).json({ error }));
+        })       
+}
