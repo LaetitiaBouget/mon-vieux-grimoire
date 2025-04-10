@@ -37,18 +37,31 @@ exports.modifyBook = (req, res, next) => {
     } :  { ...req.body };
 
     delete bookObject._userId;
-    Book.findOne({_id: req.params.id})
-        .then((book) => {
-            if (book.userId != req.auth.userId) {
-                res.status(401).json({ message: 'Non-authorisé' });
-            } else {
-                Book.updateOne({_id: req.params.id}, { ...bookObject, _id: req.params.id })
-                .then(() => res.status(200).json({ message:'Livre modifié !'}))
-                .catch(error => res.status(401).json({ error }));
-            }
-        })
-        .catch(error => res.status(400).json({ error }));
+    Book.findOne({ _id: req.params.id })
+    .then((book) => {
+        if (book.userId != req.auth.userId) {
+            return res.status(401).json({ message: 'Non-authorisé' });
+        }
 
+        if (req.file && book.imageUrl) {
+            const filename = book.imageUrl.split('/images/')[1];
+            fs.unlink(`images/${filename}`, (err) => {
+                if (err) {
+                    return res.status(500).json({ message: 'Erreur suppression ancienne image' });
+                }
+
+                Book.updateOne({ _id: req.params.id }, { ...bookObject, _id: req.params.id })
+                    .then(() => res.status(200).json({ message: 'Livre modifié !' }))
+                    .catch(error => res.status(401).json({ error }));
+            });
+        } else {
+
+            Book.updateOne({ _id: req.params.id }, { ...bookObject, _id: req.params.id })
+                .then(() => res.status(200).json({ message: 'Livre modifié !' }))
+                .catch(error => res.status(401).json({ error }));
+        }
+    })
+    .catch(error => res.status(400).json({ error }));
 };
 
 exports.deleteBook = (req, res, next) => {

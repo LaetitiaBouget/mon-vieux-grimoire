@@ -5,6 +5,9 @@ const sharp = require('sharp');
 const imagesDir = (path.join(__dirname,'../images'));
 
 exports.uploadImage = async (req, res,  next) => {
+
+    if (!req.file) return next();
+    
     try {
         fs.access(imagesDir, (error) => {
             if (error) {
