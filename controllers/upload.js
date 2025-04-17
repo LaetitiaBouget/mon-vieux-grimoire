@@ -6,6 +6,8 @@ const imagesDir = (path.join(__dirname,'../images'));
 
 exports.uploadImage = async (req, res,  next) => {
 
+
+    //If the user don't modify the image, then go to the next middleware
     if (!req.file) return next();
     
     try {

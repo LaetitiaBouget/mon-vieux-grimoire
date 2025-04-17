@@ -43,6 +43,7 @@ exports.modifyBook = (req, res, next) => {
             return res.status(401).json({ message: 'Non-authorisé' });
         }
 
+        //If new image, delete old one
         if (req.file && book.imageUrl) {
             const filename = book.imageUrl.split('/images/')[1];
             fs.unlink(`images/${filename}`, (err) => {
@@ -89,6 +90,8 @@ exports.ratingBook = (req, res, next) => {
         grade: req.body.rating
     }
 
+    const userRating = req.body.rating;
+
     Book.findOne({_id:req.params.id})
         .then(book => {
             if(!book) {
@@ -98,6 +101,10 @@ exports.ratingBook = (req, res, next) => {
             if (book.ratings.some( rating => rating.userId === req.auth.userId)) {
                 return res.status(400).json({  message:'Vous avez déjà noté ce livre'})
             } 
+
+            if (userRating < 0 || userRating > 5) {
+                return res.status(400).json({ message: 'Note non valide'})
+            }
 
             book.ratings.push(ratingObject)
 
